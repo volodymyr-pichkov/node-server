@@ -1,6 +1,8 @@
 const http = require("node:http");
 const fs = require("node:fs");
 
+const port = 8080;
+
 fs.writeFile("user.txt", "hi", err => {
   if (err) {
     console.error(err);
@@ -21,4 +23,4 @@ const server = http.createServer((req, res) => {
   }
 });
 
-server.listen(8080, () => console.log("Сервер запущен на 8080 порту"));
+server.listen(port, () => console.log("Сервер запущен на 8080 порту"));
