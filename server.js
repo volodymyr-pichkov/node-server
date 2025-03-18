@@ -1,23 +1,24 @@
-const http = require ('node:http');
-const fs = require ('node:fs');
+const http = require("node:http");
+const fs = require("node:fs");
 
-const createFile = () => {
-    fs.writeFile('user.txt', `hi`, (err) => {
-        if (err) {
-            console.error('File has not been created', err);
-        } else {
-            console.log('user.txt file has been created');
-        }
-    });
-};
+fs.writeFile("user.txt", "hi", err => {
+  if (err) {
+    console.error(err);
+  } else {
+    console.log("Файл user.txt успешно создан");
+  }
+});
 
 const server = http.createServer((req, res) => {
-    res.statusCode = 200;
-    res.setHeader('Content-Type', 'text/plain');
-    res.end('Hello World\n');
+  if (req.method === "GET") {
+    fs.readFile("user.txt", "utf8", (err, data) => res.end(err || data));
+  } else if (req.method === "POST") {
+    let body = "";
+    req.on("data", (chunk) => (body += chunk));
+    req.on("end", () =>
+      fs.appendFile("user.txt", body + "\n", () => res.end("OK"))
+    );
+  }
 });
 
-server.listen(8080, () => {
-    console.log('Server running on 8080 port');
-    createFile();
-});
+server.listen(8080, () => console.log("Сервер запущен на 8080 порту"));
