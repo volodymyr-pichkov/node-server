@@ -3,7 +3,13 @@ const fs = require("node:fs");
 
 const port = 8080;
 
-fs.writeFile("user.txt", "hi", err => {
+const users = Array.from({length: 20}, (_, index) => ({
+  id: index + 1,
+  name: String.fromCharCode(97 + index),
+  age: 22 + index,
+}))
+
+fs.writeFile("user.txt", JSON.stringify(users, null, 1), err => {
   if (err) {
     console.error(err);
   } else {
@@ -23,4 +29,4 @@ const server = http.createServer((req, res) => {
   }
 });
 
-server.listen(port, () => console.log("Сервер запущен на 8080 порту"));
+server.listen(port, () => console.log(`Сервер запущен http://localhost:${port}`));
