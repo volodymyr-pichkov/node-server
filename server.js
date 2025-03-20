@@ -3,13 +3,13 @@ const fs = require("node:fs");
 
 const port = 8080;
 
-const users = Array.from({length: 20}, (_, index) => ({
+const users = Array.from({ length: 20 }, (_, index) => ({
   id: index + 1,
   name: String.fromCharCode(97 + index),
   age: 22 + index,
-}))
+}));
 
-fs.writeFile("user.txt", JSON.stringify(users, null, 1), err => {
+fs.writeFile("user.txt", JSON.stringify(users, null, 1), (err) => {
   if (err) {
     console.error(err);
   } else {
@@ -26,7 +26,18 @@ const server = http.createServer((req, res) => {
     req.on("end", () =>
       fs.appendFile("user.txt", body + "\n", () => res.end("OK"))
     );
+  } else if (req.method === "DELETE") {
+    fs.readFile("user.txt", "utf8", (err, data) => {
+      const updatedUsers = JSON.parse(data).filter(
+        (user) => user.id != req.url.split("/")[1]
+      );
+      fs.writeFile("user.txt", JSON.stringify(updatedUsers, null, 1), (err) =>
+        res.end(err || "Пользователь удален")
+      );
+    });
   }
 });
 
-server.listen(port, () => console.log(`Сервер запущен http://localhost:${port}`));
+server.listen(port, () =>
+  console.log(`Сервер запущен http://localhost:${port}`)
+);
