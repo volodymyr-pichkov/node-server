@@ -18,6 +18,7 @@ fs.writeFile("users.txt", JSON.stringify(users, null, 1), (err) => {
 });
 
 const server = http.createServer((req, res) => {
+
   if (req.method === "GET") {
     fs.readFile("users.txt", "utf8", (err, data) => res.end(err || data));
   } else if (req.method === "POST") {
@@ -26,6 +27,7 @@ const server = http.createServer((req, res) => {
     req.on("end", () =>
       fs.appendFile("users.txt", body + "\n", () => res.end("OK"))
     );
+
   } else if (req.method === "DELETE") {
     fs.readFile("users.txt", "utf8", (err, data) => {
       const updatedUsers = JSON.parse(data).filter(
@@ -35,6 +37,7 @@ const server = http.createServer((req, res) => {
         res.end(err || "Пользователь удален")
       );
     });
+
   } else if (req.method === "PUT" || req.method === "PATCH") {
     fs.readFile("users.txt", "utf8", (err, data) => {
       if (err) {
@@ -45,6 +48,7 @@ const server = http.createServer((req, res) => {
       let body = "";
       req.on("data", (chunk) => (body += chunk));
       req.on("end", () => {
+        
         try {
           let users = JSON.parse(data);
           let updatedUser = JSON.parse(body);
