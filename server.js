@@ -35,6 +35,45 @@ const server = http.createServer((req, res) => {
         res.end(err || "Пользователь удален")
       );
     });
+  } else if (req.method === "PUT" || req.method === "PATCH") {
+    fs.readFile("users.txt", "utf8", (err, data) => {
+      if (err) {
+        res.writeHead(500, { "Content-Type": "text/plain" });
+        return res.end("Ошибка чтения файла");
+      }
+
+      let body = "";
+      req.on("data", (chunk) => (body += chunk));
+      req.on("end", () => {
+        try {
+          let users = JSON.parse(data);
+          let updatedUser = JSON.parse(body);
+          let userId = req.url.split("/")[1];
+
+          let userIndex = users.findIndex((user) => user.id == userId);
+          if (userIndex === -1) {
+            res.writeHead(404, { "Content-Type": "text/plain" });
+            return res.end("Пользователь не найден");
+          }
+
+          users[userIndex] =
+            req.method === "PUT"
+              ? updatedUser
+              : { ...users[userIndex], ...updatedUser };
+
+          fs.writeFile("users.txt", JSON.stringify(users, null, 1), (err) => {
+            if (err) {
+              res.writeHead(500, { "Content-Type": "text/plain" });
+              return res.end("Ошибка записи в файл");
+            }
+            res.end("Пользователь обновлен");
+          });
+        } catch (parseError) {
+          res.writeHead(400, { "Content-Type": "text/plain" });
+          res.end("Ошибка парсинга JSON");
+        }
+      });
+    });
   }
 });
 
